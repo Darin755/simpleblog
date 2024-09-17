@@ -3,10 +3,9 @@ import datetime
 
 app = Flask(__name__)
 
-now = datetime.datetime.now()
-
 @app.route("/")
 def hello():
+    now = datetime.datetime.now()
     return "<h1>Hello World! The time is "+str(now.time())+" on the server</h1>"
 
 if __name__ == "__main__":
