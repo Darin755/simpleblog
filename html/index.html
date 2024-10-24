@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<head>
+    <script src="lib/quilljs/quill.js"></script>
+    <link href="/lib/quilljs/quill.snow.css" rel="stylesheet">
+</head>
+<body>
+    <h1>Hello World</h1>
+    <div id="editor"></div>
+    <script>
+        const options = {
+            debug: 'info',
+            modules: {
+                toolbar: true,
+            },
+            placeholder: 'Compose an epic...',
+            theme: 'snow'
+        };
+        const container = document.getElementById('editor');
+        const quill = new Quill(container, options);
+    </script>
+</body>
