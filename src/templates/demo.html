@@ -6,7 +6,7 @@
 <body>
     <h1>Hello World</h1>
     <div id="editor"></div>
-    <button>save</button>
+    <button onclick="save()">save</button>
     <button>publish</button>
 
     <script>
@@ -20,5 +20,29 @@
         };
         const container = document.getElementById('editor');
         const quill = new Quill(container, options);
+    </script>
+    <script>
+        function save() {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/save");
+            xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+            const body = {
+                body: quill.getSemanticHTML()
+            }
+            xhr.onload = () => {
+            if (xhr.readyState == 4 && xhr.status == 201) {
+                console.log(JSON.parse(xhr.responseText));
+            } else {
+                if(xhr.status == 200) {
+                    console.log("200 - OK");
+                } else {
+                    console.log("error status "+xhr.status);
+                }
+            }
+            };
+            xhr.send(JSON.stringify(body));
+
+
+        }   
     </script>
 </body>
