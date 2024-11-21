@@ -7,12 +7,8 @@ import fileprocessing
 app = Flask(__name__, static_url_path='/static')
 
 @app.route("/")
-
-def hello_world():
-    return render_template("login.html")
-
-
-
+def root():
+    return "hi"
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -20,16 +16,23 @@ def login():
         result = FilemanagementTest.login(request.form['username'], request.form['password'])
         print(result)
         if (result == 1):
-            error = 'User not found.'
+            errorReturned = 'User not found.'
         elif(result == 2):
-            error = 'Invalid Credentials. Please try again.'
+            errorReturned = 'Invalid Credentials. Please try again.'
         elif(result == 0):
             return render_template("demo.html")
-    return render_template('login.html', error=error)
+        return render_template('login.html', errorReturned=errorReturned)
+    else:
+        return render_template('login.html')
+
+
+
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
     if request.method == 'POST':
         return render_template("newUser.html")
+
+
     
 @app.route('/makeUser', methods=['GET', 'POST'])
 def makeUser():

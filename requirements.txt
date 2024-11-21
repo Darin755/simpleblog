@@ -2,3 +2,4 @@ flask
 gunicorn
 Jinja2
 bootstrap-flask
+bcrypt

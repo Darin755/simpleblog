@@ -19,8 +19,8 @@
 <form action="/newuser" method="post">
 <input class="btn btn-default" type="submit" value="new user?">
 </form>
-      {% if error %}
-        <p class="error"><strong>Error:</strong> {{ error }}
+      {% if errorReturned %}
+        <p class="error"><strong>Error:</strong> {{ errorReturned }}
       {% endif %}
     </div>
   </body>

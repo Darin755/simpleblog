@@ -83,7 +83,5 @@ def newUser(username, password, passwordcheck):
             p = p / 'userData'
             p.mkdir(exist_ok=False)
             return 0
-    
 
-print(newUser("admin2", "admin2", "admin2"))
 
