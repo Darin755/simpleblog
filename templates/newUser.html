@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Please login</h1>
+      <br>
+      <form action="/makeUser" method="post">
+        <input type="text" placeholder="Enter a username" name="username2" value="{{
+          request.form.username2 }}">
+         <input type="password" placeholder="Enter a password" name="password2" value="{{
+          request.form.password2 }}">
+	<input type="password" placeholder="Confirm password" name="passwordCheck" value="{{
+          request.form.passwordCheck }}">
+
+        <input class="btn btn-default" type="submit" value="Login">
+      </form>
+
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+    </div>
+  </body>
+</html>
