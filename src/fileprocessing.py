@@ -4,6 +4,11 @@ import bcrypt
 Pathlib is a python library that allows for proper path navigation throughout files
 bcrypt is a python library that allows for encryption of strings 
 '''
+#create needed dirs on startup
+
+if not (Path.cwd() / 'users').exists():
+    (Path.cwd() / 'users').mkdir(exist_ok=False)
+
 
 def login(username, password):
     q = Path.cwd() #gets the current working path
@@ -35,7 +40,9 @@ def login(username, password):
             p = p / 'userData'
             return 0
               
-            
+def noUsers():
+    return not any(Path(Path.cwd() / "users").iterdir())
+
             
 def newUser(username, password, passwordcheck):
 # create a user
