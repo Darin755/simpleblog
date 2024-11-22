@@ -56,6 +56,14 @@ def login():
     else:
         return redirect("/", code=302)
 
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    cookie = request.cookies.get('authcookie')
+    if cookie:
+        for i,c in enumerate(authorized_cookies):
+            if c[1] == cookie:
+                del(authorized_cookies[i])
+    return redirect("/login", code=302)
 
 
 @app.route('/newuser', methods=['GET', 'POST'])
