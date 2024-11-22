@@ -16,8 +16,7 @@ def login(username, password):
     #moves to the user
     
     #checks if user exists
-    test = p.exists()
-    if(test == False):
+    if(not p.exists()):
         return 1
         #user does not exist
     else:
@@ -45,30 +44,22 @@ def newUser(username, password, passwordcheck):
     q = Path.cwd() #gets the current working path
   
     p = q / 'users'
-    passwordInput = password.encode('utf-8')
-    #encrpyts password
-    passwordcheck = passwordcheck.encode('utf-8')
-    #encrypt the confirmation
-    
-    # put both passwords through the salt to properly encrpyt
-    salt = bcrypt.gensalt(rounds=15)
-    hashedPass = bcrypt.hashpw(passwordInput, salt)
-    checker = bcrypt.checkpw(passwordcheck, hashedPass) 
-    #check the passwords with each other to see if they matchchecker = bcrypt.checkpw(confirmPass, hashedPass)
 
-    if(checker == False):
-        return 1
-        #passwords did not match
-    else:
+    print(password,passwordcheck)
+
+    if(password == passwordcheck):
         #passwords did match
-        p = p / username
-        
-       
+        # put both passwords through the salt to properly encrpyt
+        passwordInput = password.encode('utf-8')
+        passwordcheck = passwordcheck.encode('utf-8')
+        salt = bcrypt.gensalt(rounds=15)
+        hashedPass = bcrypt.hashpw(passwordInput, salt)
 
-        test = p.exists()
+        #set path
+        p = p / username
+       
         #check to see if username is already being used
-        
-        if(test == True):
+        if(p.exists()):
             return 2
             #user is already in use
         else:
@@ -81,7 +72,11 @@ def newUser(username, password, passwordcheck):
             
             passfile.write_bytes(hashedPass)
             p = p / 'userData'
+            print(p)
             p.mkdir(exist_ok=False)
             return 0
+    else:
+        #passwords did not match
+        return 1
 
 
