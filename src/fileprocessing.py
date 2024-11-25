@@ -39,7 +39,8 @@ def login(username, password):
             #password works
             p = p / 'userData'
             return 0
-              
+
+#if no users exist return true
 def noUsers():
     return not any(Path(Path.cwd() / "users").iterdir())
 

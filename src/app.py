@@ -10,54 +10,66 @@ app = Flask(__name__, static_url_path='/static')
 # (user, key, time created)
 authorized_cookies = []
 
-#check cookie
+#check cookie to see if user is logged in
 def checkAuth(cookie):
     auth = False
     if (not (cookie == None)) and (len(cookie) == 154):
+        #loop though cookies to see if one matches
         for c in authorized_cookies:
             if cookie == c[1]:
                 auth = c[0]
                 break
-    return auth
+    return auth #return user
 
-
+#root route
 @app.route("/")
 def root():
+    #if no users exist prompt to create one
     if fileprocessing.noUsers():
         return redirect("/newuser", code=302)
     else:
+        #check if signed in
         cookie = request.cookies.get('authcookie')
         auth = checkAuth(cookie)
         if not auth == False:
+            #we are signed in
             return render_template('demo.html')
         else:
+            #login please
             return redirect("/login", code=302)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    #if we are logged in go to root
     if checkAuth(request.cookies.get('authcookie')) == False:
-        if request.method == 'POST':
-            result = fileprocessing.login(request.form['username'], request.form['password'])
-            print(result)
-            if (result == 1):
-                errorReturned = 'User not found.'
-            elif(result == 2):
-                errorReturned = 'Invalid Credentials. Please try again.'
-            elif(result == 0):
-                authkey = str(secrets.randbits(512))
-                authorized_cookies.append((request.form['username'], authkey, time.time()))
-                resp = redirect("/", code=302)
-                resp.set_cookie('authcookie', authkey)
-                return resp
+        #new user redirect on first run
+        if not fileprocessing.noUsers():
+            if request.method == 'POST':
+                result = fileprocessing.login(request.form['username'], request.form['password'])
+                print(result)
+                if (result == 1):
+                    errorReturned = 'User not found.'
+                elif(result == 2):
+                    errorReturned = 'Invalid Credentials. Please try again.'
+                elif(result == 0):
+                    authkey = str(secrets.randbits(512))
+                    authorized_cookies.append((request.form['username'], authkey, time.time()))
+                    resp = redirect("/", code=302)
+                    resp.set_cookie('authcookie', authkey)
+                    return resp
 
-            return render_template('login.html', errorReturned=errorReturned)
+                return render_template('login.html', errorReturned=errorReturned)
+            else:
+                #this is a GET
+                return render_template('login.html')
         else:
-            return render_template('login.html')
+            return redirect("/newuser", code=302)
     else:
         return redirect("/", code=302)
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
+    #find cookie and then delete it
     cookie = request.cookies.get('authcookie')
     if cookie:
         for i,c in enumerate(authorized_cookies):
@@ -68,6 +80,7 @@ def logout():
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
+    #only allow user creation if no users exist
     if fileprocessing.noUsers():
         if request.method == 'POST':
             result = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'])
@@ -81,10 +94,9 @@ def newuser():
             return render_template('newUser.html')
     else:
         return redirect("/login", code=302)
-
-        
     return render_template("newUser.html", error=error)
-    
+
+#save
 @app.route('/save', methods=['POST'])
 def handle_post():
     if request.method == 'POST':
