@@ -1,10 +1,7 @@
 <!DOCTYPE html>
-
-
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
+{% include "header.html" %}
   <body>
+    {{ bootstrap.load_js() }}
     <div class="container">
       <h1>Please create user</h1>
       <br>
@@ -16,7 +13,7 @@
 	<input type="password" placeholder="Confirm password" name="passwordCheck" value="{{
           request.form.passwordCheck }}">
 
-        <input class="btn btn-default" type="submit" value="Login">
+        <input class="btn btn-default" type="submit" value="Create">
       </form>
 
       {% if error %}
@@ -24,4 +21,6 @@
       {% endif %}
     </div>
   </body>
+
+{% include "footer.html" %}
 </html>
