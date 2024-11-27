@@ -118,6 +118,11 @@ def handle_post():
         auth = checkAuth(cookie)
         if not auth == False:
             body = request.json
+            username = authorized_cookies[0]
+            print(username)
+            print(type(username[0]))
+            #need to properly implement how title is gathered from a text box in the main
+            fileprocessing.saved('title', str(body), username[0])
             print(body)
             return "saved"
 
