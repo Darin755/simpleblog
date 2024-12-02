@@ -17,7 +17,7 @@ authorized_cookies = []
 #check cookie to see if user is logged in
 def checkAuth(cookie):
     auth = False
-    if (not (cookie == None)) and (len(cookie) == 154):
+    if (not (cookie == None)):
         #loop though cookies to see if one matches
         for c in authorized_cookies:
             if cookie == c[1]:
@@ -95,20 +95,40 @@ def newuser():
     #only allow user creation if no users exist or logged in
     cookie = request.cookies.get('authcookie')
     auth = checkAuth(cookie)
-    if not auth == False or fileprocessing.noUsers():
+    #no users is true on first run
+    noUsers = fileprocessing.noUsers()
+    #check if allowed
+    if not auth == False or noUsers:
+        #check for admin
+        isAdmin = fileprocessing.checkAdmin(auth)
+        #should we show the admin options
+        showAdminCheck = (not noUsers) and (isAdmin)
         if request.method == 'POST':
-            result = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'])
-            if (result == 1):
-                error = 'Passwords must match!'
-            elif(result == 2):
-                error = 'password updated'
-            elif(result == 0):
-                return redirect("/login", code=302)
+            #delete checkmark
+            if "deletecheck" in request.form:
+                #only allow admins
+                if isAdmin:
+                    #don't delete ourselves'
+                    if request.form['username2'] != auth:
+                        result = fileprocessing.deleteUser(request.form['username2'])
+                    else:
+                        result = "You can not delete yourself"
+                else:
+                    result = "You do not have permition to delete users"
+            else:
+                if showAdminCheck:
+                    if "admincheck" in request.form:
+                        result = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], True, auth)
+                    else:
+                        result = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], False, auth)
+                else:
+                    result = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], None, auth)
+            return render_template('newUser.html', error=result ,showAdminCheck=showAdminCheck)
+
         elif request.method == "GET":
-            return render_template('newUser.html')
+            return render_template('newUser.html', showAdminCheck=showAdminCheck)
     else:
         return redirect("/login", code=302)
-    return render_template("newUser.html", error=error)
 
 #save
 @app.route('/save', methods=['POST'])
@@ -120,6 +140,8 @@ def handle_post():
             body = request.json
             print(body)
             return "saved"
+
+
 
 if __name__ == '__main__':
     app.run()

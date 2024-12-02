@@ -15,13 +15,23 @@
         <div data-mdb-input-init class="form-outline mb-4">
           <input type="password" placeholder="Confirm password" name="passwordCheck" value="{{ request.form.passwordCheck }}">
         </div>
+        {% if showAdminCheck %}
+          <div data-mdb-input-init class="form-outline mb-4">
+            <label for="admincheck">Make admin</label>
+            <input type="checkbox" name="admincheck" id="admincheck" value="{{ request.form.admincheck }}">
+          </div>
+          <div data-mdb-input-init class="form-outline mb-4">
+            <label for="deletecheck">Delete user</label>
+            <input type="checkbox" name="deletecheck" id="deletecheck" value="{{ request.form.deletecheck }}">
+          </div>
+        {% endif %}
         <div data-mdb-input-init class="form-outline mb-4">
           <input data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" type="submit" value="Create">
         </div>
       </form>
 
       {% if error %}
-        <p class="error"><strong>Error:</strong> {{ error }}
+        <p class="error"> {{ error }}</p>
       {% endif %}
     </div>
   </body>

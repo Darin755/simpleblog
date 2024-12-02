@@ -37,11 +37,20 @@ def noUsers():
     return not any(Path(Path.cwd() / "users").iterdir())
 
             
-def newUser(username, password, passwordcheck):
+def newUser(username, password, passwordcheck, admincheck, auth):
 # create a user
-    
+    print("check is"+str(admincheck))
     #input the name for the user
     userPath = Path.cwd() / 'users' #gets the current working path plus user
+
+    #check if user is authorized
+    if admincheck != None:
+        if auth == username:
+            if not admincheck:
+                return "You can not strip your own admin access"
+        else:
+            if not checkAdmin(auth):
+                return "You do not have permission"
 
     if(password == passwordcheck):
         #passwords did match
@@ -53,7 +62,7 @@ def newUser(username, password, passwordcheck):
 
         #username path
         usernamePath = userPath / username
-       
+
         #check to see if username is already being used
         if(usernamePath.exists()):
             #create password file if it doesn't exist'
@@ -63,7 +72,12 @@ def newUser(username, password, passwordcheck):
             #create userData
             if not (usernamePath / 'userData').exists():
                 (usernamePath / 'userData').mkdir()
-            return 2
+            #add to admin if needed
+            if admincheck == True:
+                makeAdmin(username)
+            elif admincheck == False:
+                removeAdmin(username)
+            return "Updated user"
             #user is already in use but password updated
         else:
             #create a user with filename = to input
@@ -74,10 +88,57 @@ def newUser(username, password, passwordcheck):
             #put hashed password into file
             passfile.write_bytes(hashedPass)
             (usernamePath / 'userData').mkdir()
-            return 0
+
+            #if admin
+            if admincheck or auth == False:
+                makeAdmin(username)
+            return "Created user"
     else:
         #passwords did not match
         return 1
+
+#recursive function to delete
+def rmDir(dirpath):
+    if dirpath.is_file():
+        dirpath.unlink()
+    else:
+        for child in dirpath.iterdir():
+            rmDir(child)
+        dirpath.rmdir()
+
+
+#delete a user
+def deleteUser(user):
+    usernamePath = Path.cwd() / 'users' / user
+    if usernamePath.exists():
+        rmDir(usernamePath)
+        return "deleted user"
+    else:
+        return "user does not exist"
+
+#make a user admin
+def makeAdmin(user):
+    print("making "+user+" admin")
+    usernamePath = Path.cwd() / 'users' / user
+    (usernamePath / "admin.txt").touch()
+
+#remove admin
+def removeAdmin(user):
+    print("stripping "+user+" of admin")
+    usernamePath = Path.cwd() / 'users' / user
+    if (usernamePath / "admin.txt").exists():
+        (usernamePath / "admin.txt").unlink()
+
+
+#check if admin
+def checkAdmin(user):
+    if user != False:
+        usernamePath = Path.cwd() / 'users' / user
+        if (usernamePath / "admin.txt").exists():
+            return True
+        else:
+            return False
+
 
 def displayAll():
     returnList = []
@@ -87,6 +148,7 @@ def displayAll():
         returnList += i
     #returns a list of public post names
     return returnList
+
 def displayAllUsers(username):
     returnList = []
     for i in (Path.cwd() / 'users' / username):
@@ -122,6 +184,7 @@ def saved(title, text, username):
     textfile.touch()
     #write to file
     textfile.write_text(text)
+
 def getText(mode, fileToGet):
     q = Path.cwd()
     #if method was from user profile
