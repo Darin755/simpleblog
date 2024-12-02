@@ -2,18 +2,22 @@
 {% include "header.html" %}
   <body>
     {{ bootstrap.load_js() }}
-    <div class="container">
-      <h1>Please create user</h1>
+    <div class="container d-flex flex-column justify-content-center align-items-center w-25 border " style="height: 500px; margin-top: 50px;">
+      <h1>New User</h1>
       <br>
       <form action="/newuser" method="post">
-        <input type="text" placeholder="Enter a username" name="username2" value="{{
-          request.form.username2 }}">
-         <input type="password" placeholder="Enter a password" name="password2" value="{{
-          request.form.password2 }}">
-	<input type="password" placeholder="Confirm password" name="passwordCheck" value="{{
-          request.form.passwordCheck }}">
-
-        <input class="btn btn-default" type="submit" value="Create">
+        <div data-mdb-input-init class="form-outline mb-4">
+          <input type="text" placeholder="Enter a username" name="username2" value="{{ request.form.username2 }}">
+        </div>
+        <div data-mdb-input-init class="form-outline mb-4">
+          <input type="password" placeholder="Enter a password" name="password2" value="{{ request.form.password2 }}">
+        </div>
+        <div data-mdb-input-init class="form-outline mb-4">
+          <input type="password" placeholder="Confirm password" name="passwordCheck" value="{{ request.form.passwordCheck }}">
+        </div>
+        <div data-mdb-input-init class="form-outline mb-4">
+          <input data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" type="submit" value="Create">
+        </div>
       </form>
 
       {% if error %}

@@ -24,6 +24,8 @@ def checkAuth(cookie):
                 auth = c[0]
                 print("authenticated "+auth+" with cookie")
                 break
+    if auth == False:
+        print("cookie invalid")
     return auth #return user
 
 print("creating routes")
@@ -53,13 +55,7 @@ def login():
         #new user redirect on first run
         if not fileprocessing.noUsers():
             if request.method == 'POST':
-                result = fileprocessing.login(request.form['username'], request.form['password'])
-                print(result)
-                if (result == 1):
-                    errorReturned = 'User not found.'
-                elif(result == 2):
-                    errorReturned = 'Invalid Credentials. Please try again.'
-                elif(result == 0):
+                if(fileprocessing.login(request.form['username'], request.form['password']) == 0):
                     print("authentication successful for "+request.form['username'])
                     authkey = str(secrets.randbits(512))
                     authorized_cookies.append((request.form['username'], authkey, time.time()))
@@ -67,7 +63,8 @@ def login():
                     resp.set_cookie('authcookie', authkey)
                     print("set cookie for "+request.form['username'])
                     return resp
-
+                else:
+                    errorReturned = 'Invalid Credentials. Please try again.'
                 return render_template('login.html', errorReturned=errorReturned)
             else:
                 #this is a GET
@@ -88,7 +85,9 @@ def logout():
             if c[1] == cookie:
                 del(authorized_cookies[i])
                 print("logged out")
-    return redirect("/login", code=302)
+    resp = redirect("/login", code=302)
+    resp.set_cookie('authcookie', "", expires=0)
+    return resp
 
 
 @app.route('/newuser', methods=['GET', 'POST'])
@@ -102,7 +101,7 @@ def newuser():
             if (result == 1):
                 error = 'Passwords must match!'
             elif(result == 2):
-                error = 'Username already in use!'
+                error = 'password updated'
             elif(result == 0):
                 return redirect("/login", code=302)
         elif request.method == "GET":

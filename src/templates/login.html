@@ -2,21 +2,25 @@
 {% include "header.html" %}
   <body>
     {{ bootstrap.load_js() }}
-    <div class="container">
-      <h1>Please login</h1>
-      <br>
-      <form action="/login" method="post">
-        <input type="text" placeholder="Username" name="username" value="{{
-          request.form.username }}">
-         <input type="password" placeholder="Password" name="password" value="{{
-          request.form.password }}">
-        <input class="btn btn-default" type="submit" value="Login">
-      </form>
-</form>
-      {% if errorReturned %}
-        <p class="error"><strong>Error:</strong> {{ errorReturned }}
-      {% endif %}
-    </div>
+      <div class="container d-flex flex-column justify-content-center align-items-center w-25 border " style="height: 500px; margin-top: 50px;">
+        <h1>Please login</h1>
+        <br>
+        <form action="/login" method="post">
+        <div data-mdb-input-init class="form-outline mb-4">
+          <input type="text" placeholder="Username" name="username" value="{{ request.form.username }}">
+        </div>
+        <div data-mdb-input-init class="form-outline mb-4">
+          <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}">
+        </div>
+        <div data-mdb-input-init class="form-outline mb-4">
+          <input data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4" type="submit" value="Login">
+        </div>
+        </form>
+  </form>
+        {% if errorReturned %}
+          <p class="error"><strong>Error:</strong> {{ errorReturned }}
+        {% endif %}
+      </div>
   </body>
 
 {% include "footer.html" %}

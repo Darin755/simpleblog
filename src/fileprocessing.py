@@ -11,34 +11,26 @@ if not (Path.cwd() / 'users').exists():
 
 
 def login(username, password):
-    q = Path.cwd() #gets the current working path
-    
-    p = q / 'users'
-    
-    passwordInput = password.encode('utf-8')
-    #encrpyts password
-    p = p / username
-    #moves to the user
-    
+    userPath = Path.cwd() / 'users' #gets the current working path plus users
+    passwordInput = password.encode('utf-8') #get password
     #checks if user exists
-    if(not p.exists()):
-        return 1
-        #user does not exist
-    else:
-        
+    if(username != "" and (userPath / username).exists()):
+        usernamePath = userPath / username
         #user exists and is checking password
-        passfile = p / 'password.txt'
+        passfile = usernamePath / 'password.txt'
         #opens the password file
-        result = bcrypt.checkpw(passwordInput, passfile.read_bytes())
         #checks the password given with the password in the file
-        if(result == False):
-            return 2
-            #invalid password
-        else:
-            
-            #password works
-            p = p / 'userData'
+        if(bcrypt.checkpw(passwordInput, passfile.read_bytes())):
+            #correct password
             return 0
+        else:
+            #login failed
+            return 1
+    else:
+        #login failed
+        return 1
+
+
 
 #if no users exist return true
 def noUsers():
@@ -49,11 +41,7 @@ def newUser(username, password, passwordcheck):
 # create a user
     
     #input the name for the user
-    q = Path.cwd() #gets the current working path
-  
-    p = q / 'users'
-
-    print(password,passwordcheck)
+    userPath = Path.cwd() / 'users' #gets the current working path plus user
 
     if(password == passwordcheck):
         #passwords did match
@@ -63,25 +51,29 @@ def newUser(username, password, passwordcheck):
         salt = bcrypt.gensalt(rounds=15)
         hashedPass = bcrypt.hashpw(passwordInput, salt)
 
-        #set path
-        p = p / username
+        #username path
+        usernamePath = userPath / username
        
         #check to see if username is already being used
-        if(p.exists()):
+        if(usernamePath.exists()):
+            #create password file if it doesn't exist'
+            passfile = usernamePath / 'password.txt'
+            passfile.touch()
+            passfile.write_bytes(hashedPass)
+            #create userData
+            if not (usernamePath / 'userData').exists():
+                (usernamePath / 'userData').mkdir()
             return 2
-            #user is already in use
+            #user is already in use but password updated
         else:
             #create a user with filename = to input
-            p.mkdir(exist_ok=False)
+            usernamePath.mkdir(exist_ok=False)
             #create a password file
-            passfile = p / 'password.txt'
+            passfile = usernamePath / 'password.txt'
             passfile.touch()
             #put hashed password into file
-            
             passfile.write_bytes(hashedPass)
-            p = p / 'userData'
-            print(p)
-            p.mkdir(exist_ok=False)
+            (usernamePath / 'userData').mkdir()
             return 0
     else:
         #passwords did not match
