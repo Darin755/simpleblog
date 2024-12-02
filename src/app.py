@@ -93,9 +93,10 @@ def logout():
 
 @app.route('/newuser', methods=['GET', 'POST'])
 def newuser():
-    #only allow user creation if no users exist
-    if fileprocessing.noUsers():
-        print("prompting to create new user")
+    #only allow user creation if no users exist or logged in
+    cookie = request.cookies.get('authcookie')
+    auth = checkAuth(cookie)
+    if not auth == False or fileprocessing.noUsers():
         if request.method == 'POST':
             result = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'])
             if (result == 1):
