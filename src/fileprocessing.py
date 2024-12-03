@@ -156,7 +156,6 @@ def displayAllUsers(username):
     #returns a list of users
     return returnList
 
-
 def saved(title, text, username):
     q = Path.cwd()
 
@@ -189,3 +188,8 @@ def writePage(url,html):
 def getPages():
     #returns a dictionary
     # this will have nested dictionaries for subfolders
+    return {}
+
+def deletePage(url):
+    #takes either a folder or a page
+    return "deleted"
