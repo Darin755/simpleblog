@@ -150,11 +150,26 @@ def displayAll():
     return returnList
 
 def displayAllUsers(username):
-    returnList = []
-    for i in (Path.cwd() / 'users' / username):
-        returnList += i
-    #returns a list of users
-    return returnList
+    returnTuple = ()
+    q = Path.cwd()
+    
+    p = q  / 'users' / username / 'userData'
+    obj = p.iterdir()
+    for i in (obj):
+       
+        fullPath = str(i)
+       
+        tupleToAdd = ()
+        fullPath = fullPath.split("\\")
+        string = fullPath[-1]
+        x = string.split("_")
+        print(x)
+        tupleToAdd += (x[0],)
+        
+        y = x[1].split(".")
+        print(y)
+        tupleToAdd += (y[0],)
+        returnTuple += tupleToAdd
 
 
 def publish(title, text):
@@ -194,3 +209,4 @@ def getText(mode, fileToGet):
         #if method was from public
         p = q  / 'public' / fileToGet
     return p.read_text
+print(displayAllUsers('admin'))
