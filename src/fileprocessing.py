@@ -144,21 +144,15 @@ def displayAll():
     returnList = []
     if not (Path.cwd() / 'public').exists():
         (Path.cwd() / 'public').mkdir(exist_ok=False)
-    for i in (Path.cwd() / 'public'):
-        returnList += i
-    #returns a list of public post names
-    return returnList
-
-def displayAllUsers(username):
-    returnTuple = ()
+    returnList = []
     q = Path.cwd()
     
-    p = q  / 'users' / username / 'userData'
+    p = q  / 'public'
     obj = p.iterdir()
     for i in (obj):
-       
+        
         fullPath = str(i)
-       
+        print(fullPath)
         tupleToAdd = ()
         fullPath = fullPath.split("\\")
         string = fullPath[-1]
@@ -169,8 +163,37 @@ def displayAllUsers(username):
         y = x[1].split(".")
         print(y)
         tupleToAdd += (y[0],)
-        returnTuple += tupleToAdd
+        returnList.append(tupleToAdd)
+        #returns a list of users
+    return returnList
 
+
+def displayAllUsers(username)
+    returnList = []
+    q = Path.cwd()
+    
+    p = q  / 'users' / username / 'userData'
+    obj = p.iterdir()
+    for i in (obj):
+        
+        fullPath = str(i)
+        print(fullPath)
+        tupleToAdd = ()
+        fullPath = fullPath.split("\\")
+        string = fullPath[-1]
+        x = string.split("_")
+        print(x)
+        tupleToAdd += (x[0],)
+        
+        y = x[1].split(".")
+        print(y)
+        tupleToAdd += (y[0],)
+        returnList.append(tupleToAdd)
+            
+           
+        
+    #returns a list of users
+    return returnList
 
 def publish(title, text):
     #check to make sure public exists
@@ -209,4 +232,4 @@ def getText(mode, fileToGet):
         #if method was from public
         p = q  / 'public' / fileToGet
     return p.read_text
-print(displayAllUsers('admin'))
+
