@@ -152,16 +152,13 @@ def displayAll():
     for i in (obj):
         
         fullPath = str(i)
-        print(fullPath)
         tupleToAdd = ()
         fullPath = fullPath.split("\\")
         string = fullPath[-1]
         x = string.split("_")
-        print(x)
         tupleToAdd += (x[0],)
         
         y = x[1].split(".")
-        print(y)
         tupleToAdd += (y[0],)
         returnList.append(tupleToAdd)
         #returns a list of users
@@ -177,16 +174,13 @@ def displayAllUsers(username):
     for i in (obj):
         
         fullPath = str(i)
-        print(fullPath)
         tupleToAdd = ()
         fullPath = fullPath.split("\\")
         string = fullPath[-1]
         x = string.split("_")
-        print(x)
         tupleToAdd += (x[0],)
         
         y = x[1].split(".")
-        print(y)
         tupleToAdd += (y[0],)
         returnList.append(tupleToAdd)
             
