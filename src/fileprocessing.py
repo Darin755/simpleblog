@@ -181,6 +181,11 @@ def getText(mode, fileToGet):
         p = q  / 'public' / fileToGet
     return p.read_text
 
+#write the page
 def writePage(url,html):
     #The html var is the output from render_template
-    return True#just a place holder
+    return "hi"#just a place holder
+
+def getPages():
+    #returns a dictionary
+    # this will have nested dictionaries for subfolders
