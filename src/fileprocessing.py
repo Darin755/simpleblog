@@ -196,19 +196,19 @@ def displayAllUsers(username):
     return returnList
 
 def publish(title, text):
-    #check to make sure public exists
-    if not (Path.cwd() / 'public').exists():
-        (Path.cwd() / 'public').mkdir(exist_ok=False)
-    q = Path.cwd() / 'public'
-    #move to public
-    title = username + '_' + title + '.txt'
-    #naming convention of username_title.txt
-    q = q / title
-    q.touch()
-    #create file
-    q.write_text(text)
-    #write to file
-
+  #check to make sure public exists
+  if not (Path.cwd() / 'public').exists():
+      (Path.cwd() / 'public').mkdir(exist_ok=False)
+  q = Path.cwd() / 'public'
+  #move to public
+  title = username + '_' + title + '.txt'
+  #naming convention of username_title.txt
+  q = q / title
+  q.touch()
+  #create file
+  q.write_text(text)
+  #write to file
+  
 def saved(title, text, username):
     q = Path.cwd()
 
@@ -233,3 +233,16 @@ def getText(mode, fileToGet):
         p = q  / 'public' / fileToGet
     return p.read_text
 
+#write the page
+def writePage(url,html):
+    #The html var is the output from render_template
+    return "hi"#just a place holder
+
+def getPages():
+    #returns a dictionary
+    # this will have nested dictionaries for subfolders
+    return {}
+
+def deletePage(url):
+    #takes either a folder or a page
+    return "deleted"
