@@ -13,7 +13,7 @@ bootstrap = Bootstrap(app)
 
 # (user, key, time created)
 authorized_cookies = []
-
+headings = ("Username", "Title")
 #check cookie to see if user is logged in
 def checkAuth(cookie):
     auth = False
@@ -42,7 +42,7 @@ def root():
         auth = checkAuth(cookie)
         if not auth == False:
             #we are signed in
-            return render_template('dash.html')
+            return render_template('dash.html', headings=headings, data=fileprocessing.displayAllUsers(str(auth)), username=str(auth))
         else:
             #login please
             return redirect("/login", code=302)
@@ -140,7 +140,11 @@ def handle_post():
             body = request.json
             print(body)
             return "saved"
-
+        
+@app.route('/editPost', methods=['POST'])
+def editPost():
+    print(request.form['index'])
+    return "place holder function!"
 
 
 if __name__ == '__main__':
