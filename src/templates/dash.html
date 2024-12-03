@@ -31,15 +31,35 @@
             <h1>Hello</h1>
         </div>
     <div class="tab-pane fade" id="pages" role="tabpanel" aria-labelledby="pages-tab">
+        <div id="page_selector">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Page Name</th>
+                        <th scope="col">Published</th>
+                        <th scope="col">edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>test page</td>
+                        <td>No</td>
+                        <td><button onclick="showEditor()" class="btn btn-primary">Edit</button></td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
         <div id="editordiv" style="display:none;">
             <div id="editor"></div>
                 <button onclick="save()">save</button>
                 <button>publish</button>
-        </div>
-
+                <button>delete</button>
+                <button>back</button>
+            </div>
     </div>
     <div class="tab-pane fade" id="user" role="tabpanel" aria-labelledby="user-tab">
-
+        {% include "newUser.html" %}
     </div>
     </div>
 
@@ -54,6 +74,15 @@
         };
         const container = document.getElementById('editor');
         const quill = new Quill(container, options);
+
+        editordiv = document.getElementById("editordiv");
+        tablediv = document.getElementById("page_selector");
+
+        function showEditor(page) {
+            editordiv.style.display = "block";
+            tablediv.style.display = "none";
+        }
+
         function save() {
             const xhr = new XMLHttpRequest();
             xhr.open("POST", "/save");

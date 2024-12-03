@@ -42,7 +42,7 @@ def root():
         auth = checkAuth(cookie)
         if not auth == False:
             #we are signed in
-            return render_template('dash.html', data=fileprocessing.displayAllUsers(str(auth)), username=str(auth))
+            return render_template('dash.html', data=fileprocessing.displayAllUsers(str(auth)), username=str(auth), showAdminCheck=fileprocessing.checkAdmin(auth))
         else:
             #login please
             return redirect("/login", code=302)
@@ -140,10 +140,6 @@ def handle_post():
             body = request.json
             print(body)
             return "saved"
-        
-@app.route('/editPost', methods=['POST'])
-def editPost():
-    return "place holder function!"
 
 
 if __name__ == '__main__':
