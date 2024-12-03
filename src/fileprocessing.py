@@ -168,7 +168,7 @@ def displayAll():
     return returnList
 
 
-def displayAllUsers(username)
+def displayAllUsers(username):
     returnList = []
     q = Path.cwd()
     
