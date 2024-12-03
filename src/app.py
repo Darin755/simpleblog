@@ -1,6 +1,6 @@
 # Route for handling the login page logic
 from flask import Flask, render_template, redirect, url_for, request
-from flask_bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap5
 import os
 import fileprocessing
 import secrets
@@ -9,11 +9,11 @@ import time
 print("starting up")
 
 app = Flask(__name__, static_url_path='/static')
-bootstrap = Bootstrap(app)
+bootstrap = Bootstrap5(app)
 
 # (user, key, time created)
 authorized_cookies = []
-headings = ("Username", "Title")
+
 #check cookie to see if user is logged in
 def checkAuth(cookie):
     auth = False
@@ -42,7 +42,7 @@ def root():
         auth = checkAuth(cookie)
         if not auth == False:
             #we are signed in
-            return render_template('dash.html', headings=headings, data=fileprocessing.displayAllUsers(str(auth)), username=str(auth))
+            return render_template('dash.html', data=fileprocessing.displayAllUsers(str(auth)), username=str(auth))
         else:
             #login please
             return redirect("/login", code=302)
@@ -143,7 +143,6 @@ def handle_post():
         
 @app.route('/editPost', methods=['POST'])
 def editPost():
-    print(request.form['index'])
     return "place holder function!"
 
 

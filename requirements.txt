@@ -1,5 +1,5 @@
 flask
 gunicorn
 Jinja2
-flask_bootstrap
+bootstrap-flask
 bcrypt

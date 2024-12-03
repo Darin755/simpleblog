@@ -3,29 +3,47 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="#">Home</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/newuser">user(s)</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">admin</a>
+        <a class="nav-link" href="#">Signed in as {{ username }} </a>
       </li>
     </ul>
-    <a class="nav-link" href="/logout">logout</a>
+    <div  class="collapse navbar-collapse justify-content-end">
+        <a class="nav-link" href="/logout">logout</a>
+    </div>
 </nav>
 
 
 <body>
-<form action="/save" method="post">
-<input type="text" placeholder="Title" name="Title" value="{{ request.form.Title }}">
-</form>
     {{ bootstrap.load_js() }}
-    <div id="editor"></div>
-    <button onclick="save()">save</button>
-    <button>publish</button>
 
-    <script>
+    <ul class="nav nav-tabs" id="menutabsbuttons" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Home</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pages-tab" data-bs-toggle="tab" data-bs-target="#pages" type="button" role="tab" aria-controls="pages" aria-selected="false">Pages</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="user-tab" data-bs-toggle="tab" data-bs-target="#user" type="button" role="tab" aria-controls="user" aria-selected="false">User config</button>
+    </li>
+    </ul>
+    <div class="tab-content" id="menutabs">
+        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <h1>Hello</h1>
+        </div>
+    <div class="tab-pane fade" id="pages" role="tabpanel" aria-labelledby="pages-tab">
+        <div id="editordiv" style="display:none;">
+            <div id="editor"></div>
+                <button onclick="save()">save</button>
+                <button>publish</button>
+        </div>
+
+    </div>
+    <div class="tab-pane fade" id="user" role="tabpanel" aria-labelledby="user-tab">
+
+    </div>
+    </div>
+
+<script>
         const options = {
             debug: 'info',
             modules: {
@@ -36,8 +54,6 @@
         };
         const container = document.getElementById('editor');
         const quill = new Quill(container, options);
-    </script>
-    <script>
         function save() {
             const xhr = new XMLHttpRequest();
             xhr.open("POST", "/save");
@@ -58,48 +74,13 @@
             };
 		{% set count = namespace(value= request.form.Title) %}
             xhr.send(JSON.stringify(body));
-	
+
 
 
         }
 
-   
-    </script>
-<p class="Username"><strong>Username:</strong> {{ username }} 
-      <h1></h1>
-	<table>
-	<tr>
-	{% set count = namespace(value=0) %}
-	{% set count2 = namespace(value=0) %}
-	{% for header in headings %}
-	<th> {{ header }} </th>
-	{% endfor %}
-	</tr>
-	{% for row in data %}
-	<tr>
-	{% for cell in row %}
-	{% if count.value % 2 == 0 %}
-	
-	<td> {{ cell }} </td>
 
-	{% else %}
-	{% set count2.value = count2.value + 1 %}
-	<form action="/editPost" method="post">
-	<input type="hidden" id="index" name="index" value="{{ count2.value }}">
-    	<td> <input class="btn btn-default" type="submit" value="{{ cell }}"> </td>
-	</form>
-	{% endif %}
-	
-	{% set count.value = count.value + 1 %}
-	{% endfor %}
-	
-	</tr>
-	{% endfor %}
-
-	</table>
-      <br>
-     
-</form>
+</script>
 
 </body>
 {% include "footer.html" %}
