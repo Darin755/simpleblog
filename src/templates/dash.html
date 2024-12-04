@@ -11,6 +11,22 @@
     </div>
 </nav>
 
+<script>
+    //return to tab in URL
+    var url = window.location.href.split("#");
+    if(url.length <= 1) {
+        window.location.href+="#home";
+    } else {
+        //clear active
+        while(document.getElementsByClassName('active').length > 0){
+            document.getElementsByClassName('active')[0].classList.remove('active')
+        }
+        document.getElementById(url[1]).classList.add("show");
+        document.getElementById(url[1]).classList.add("active");
+        document.getElementById(url[1]+"-tab").classList.add("active")
+    }
+
+</script>
 
 <body>
     {{ bootstrap.load_js() }}
@@ -31,7 +47,7 @@
             <h1 id="clock"></h1>
             <script>
                 //clock
-                const clock = document.getElementById("clock")
+                const clock = document.getElementById("clock");
                 window.setInterval(function() {
                     //update the clock
                     clock.innerHTML = (new Date().toLocaleTimeString());
@@ -51,13 +67,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>test page</td>
-                        <td>9:00</td>
-                        <td>Not Published</td>
-                        <td>N/A</td>
-                        <td><button onclick="showEditor()" class="btn btn-primary">Edit</button></td>
-                    </tr>
+                    {% for page in pages %}
+                        <tr>
+                            <td>{{ page[1] }}</td>
+                            <td>{{ page[2] }}</td>
+                            <td>Not Published</td>
+                            <td>N/A</td>
+                            <td><button onclick="showEditor()" class="btn btn-primary">Edit</button></td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
 
             </table>
@@ -104,6 +122,7 @@
             xhr.open("POST", "/save");
             xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
             const body = {
+                name: "filler",
                 body: quill.getSemanticHTML()
             }
             xhr.onload = () => {
@@ -119,9 +138,6 @@
             };
 		{% set count = namespace(value= request.form.Title) %}
             xhr.send(JSON.stringify(body));
-
-
-
         }
 
 

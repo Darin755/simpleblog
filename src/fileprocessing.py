@@ -90,6 +90,9 @@ def newUser(username, password, passwordcheck, admincheck, auth):
             passfile.write_bytes(hashedPass)
             (usernamePath / 'userData').mkdir()
 
+            #create default page
+            savePage("index", username+"'s page", username)
+
             #if admin
             if admincheck or auth == False:
                 makeAdmin(username)
@@ -167,21 +170,27 @@ def displayAll():
 
 
 def displayAllUsers(username):
-    tupleToAdd = ()
+    returnList = []
     files = (Path.cwd()  / 'users' / username / 'userData').iterdir()
     for filename in files:
         try:
-            fullPath = filename.split("\\")
+            fullPath = str(filename).split("\\")
+            tupleToAdd = ()
             nameArray = fullPath[-1].split("_")
+            #[0] is username
             tupleToAdd += (nameArray[0],)
+            #[1] is title
             tupleToAdd += (nameArray[1].split(".")[0],)
-            tupleToAdd += (Path.cwd()  / 'users' / username / 'userData' / filename).stat().st_mtime
+            #[2] is last modification
+            editTime = (Path.cwd()  / 'users' / username / 'userData' / filename).stat().st_mtime
+            tupleToAdd += (datetime.fromtimestamp(editTime).ctime(),)
             returnList.append(tupleToAdd)
-        except:
-            print("failed to parse "+i)
+        except Exception as e:
+            print(e)
+            print("failed to parse "+str(filename))
 
     #returns a list of users
-    return tupleToAdd
+    return returnList
 
 def publish(title, text):
   #check to make sure public exists
@@ -197,15 +206,10 @@ def publish(title, text):
   q.write_text(text)
   #write to file
   
-def saved(title, text, username):
-    q = Path.cwd()
-
-    p = q  / 'users' / username
-    #gets proper directory
-
+def savePage(title, text, username):
     #saves using username_title as convention
     title = username + '_' + title + '.txt'
-    textfile = p / title
+    textfile = Path.cwd()  / 'users' /  username / 'userData' / title
     #create file
     textfile.touch()
     #write to file
