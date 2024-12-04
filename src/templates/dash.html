@@ -36,19 +36,24 @@
                 <thead>
                     <tr>
                         <th scope="col">Page Name</th>
-                        <th scope="col">Published</th>
+                        <th scope="col">Modified</th>
+                        <th scope="col">Published URL</th>
+                        <th scope="col">Published time</th>
                         <th scope="col">edit</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>test page</td>
-                        <td>No</td>
+                        <td>9:00</td>
+                        <td>Not Published</td>
+                        <td>N/A</td>
                         <td><button onclick="showEditor()" class="btn btn-primary">Edit</button></td>
                     </tr>
                 </tbody>
 
             </table>
+            <button onclick="showEditor()" class="btn btn-primary">Edit</button>
         </div>
         <div id="editordiv" style="display:none;">
             <div id="editor"></div>
