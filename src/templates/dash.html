@@ -28,7 +28,15 @@
     </ul>
     <div class="tab-content" id="menutabs">
         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-            <h1>Funny Placeholder :0</h1>
+            <h1 id="clock"></h1>
+            <script>
+                //clock
+                const clock = document.getElementById("clock")
+                window.setInterval(function() {
+                    //update the clock
+                    clock.innerHTML = (new Date().toLocaleTimeString());
+                }, 1000);
+            </script>
         </div>
     <div class="tab-pane fade" id="pages" role="tabpanel" aria-labelledby="pages-tab">
         <div id="page_selector">
@@ -53,7 +61,10 @@
                 </tbody>
 
             </table>
-            <button onclick="showEditor()" class="btn btn-primary">Edit</button>
+            <div>
+                <button onclick="" class="btn btn-primary">Create page</button>
+                <input id="filename" placeholder="your page name"></input>
+            </div>
         </div>
         <div id="editordiv" style="display:none;">
             <div id="editor"></div>
@@ -80,8 +91,8 @@
         const container = document.getElementById('editor');
         const quill = new Quill(container, options);
 
-        editordiv = document.getElementById("editordiv");
-        tablediv = document.getElementById("page_selector");
+        const editordiv = document.getElementById("editordiv");
+        const tablediv = document.getElementById("page_selector");
 
         function showEditor(page) {
             editordiv.style.display = "block";
