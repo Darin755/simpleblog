@@ -12,18 +12,39 @@
 </nav>
 
 <script>
-    //return to tab in URL
-    var url = window.location.href.split("#");
-    if(url.length <= 1) {
-        window.location.href+="#home";
-    } else {
-        //clear active
-        while(document.getElementsByClassName('active').length > 0){
-            document.getElementsByClassName('active')[0].classList.remove('active')
+    window.onload = function() {
+        //return to tab in URL
+        var url = window.location.href.split("#");
+        if(url.length <= 1) {
+            {% if tab %}
+                window.location.href+="#{{ tab }}";
+                while(document.getElementsByClassName('active').length > 0){
+                    document.getElementsByClassName('active')[0].classList.remove('active')
+                }
+                document.getElementById("{{ tab }}").classList.add("show");
+                document.getElementById("{{ tab }}").classList.add("active");
+                document.getElementById("{{ tab }}"+"-tab").classList.add("active")
+            {% else %}
+                window.location.href+="#home"
+            {% endif %}
+        } else {
+            //clear active
+            while(document.getElementsByClassName('active').length > 0){
+                document.getElementsByClassName('active')[0].classList.remove('active')
+            }
+            document.getElementById(url[1]).classList.add("show");
+            document.getElementById(url[1]).classList.add("active");
+            document.getElementById(url[1]+"-tab").classList.add("active")
         }
-        document.getElementById(url[1]).classList.add("show");
-        document.getElementById(url[1]).classList.add("active");
-        document.getElementById(url[1]+"-tab").classList.add("active")
+    }
+
+    function setURLHash(text) {
+        var url = window.location.href.split("#");
+        if(url.length <= 1) {
+            window.location.href+="#"+text;
+        } else {
+            window.location.href = url[0]+"#"+text;
+        }
     }
 
 </script>
@@ -33,13 +54,13 @@
 
     <ul class="nav nav-tabs" id="menutabsbuttons" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Home</button>
+        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" onclick="setURLHash('home')" type="button" role="tab" aria-controls="home" aria-selected="true">Home</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pages-tab" data-bs-toggle="tab" data-bs-target="#pages" type="button" role="tab" aria-controls="pages" aria-selected="false">Pages</button>
+        <button class="nav-link" id="pages-tab" data-bs-toggle="tab" data-bs-target="#pages" onclick="setURLHash('pages')" type="button" role="tab" aria-controls="pages" aria-selected="false">Pages</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="user-tab" data-bs-toggle="tab" data-bs-target="#user" type="button" role="tab" aria-controls="user" aria-selected="false">User config</button>
+        <button class="nav-link" id="user-tab" data-bs-toggle="tab" data-bs-target="#user" onclick="setURLHash('user')" type="button" role="tab" aria-controls="user" aria-selected="false">User config</button>
     </li>
     </ul>
     <div class="tab-content" id="menutabs">

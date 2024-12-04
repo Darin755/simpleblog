@@ -124,7 +124,8 @@ def newuser():
                 else:
                     returnMsg = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], None, auth)
             #returnMsg is the message displayed to the user
-            return render_template('dash.html', error=returnMsg, pages=fileprocessing.displayAllUsers(str(auth)), username=auth, showAdminCheck=fileprocessing.checkAdmin(auth))
+            print(request.url)
+            return render_template('dash.html', error=returnMsg, tab="user", pages=fileprocessing.displayAllUsers(str(auth)), username=auth, showAdminCheck=fileprocessing.checkAdmin(auth))
 
         elif request.method == "GET":
             return render_template('newUser.html', showAdminCheck=showAdminCheck)
