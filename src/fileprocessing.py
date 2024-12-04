@@ -192,7 +192,7 @@ def displayAllUsers(username):
     #returns a list of users
     return returnList
 
-def publish(title, text):
+def publish(title, text, url):
   #check to make sure public exists
   if not (Path.cwd() / 'public').exists():
       (Path.cwd() / 'public').mkdir(exist_ok=False)

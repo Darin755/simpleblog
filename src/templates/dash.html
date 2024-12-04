@@ -69,6 +69,7 @@
             <script>
                 //clock
                 const clock = document.getElementById("clock");
+                clock.innerHTML = (new Date().toLocaleTimeString());
                 window.setInterval(function() {
                     //update the clock
                     clock.innerHTML = (new Date().toLocaleTimeString());
@@ -94,7 +95,7 @@
                             <td>{{ page[2] }}</td>
                             <td>Not Published</td>
                             <td>N/A</td>
-                            <td><button onclick="showEditor()" class="btn btn-primary">Edit</button></td>
+                            <td><button onclick="setEditor('{{ page[1] }}')" class="btn btn-primary">Edit</button></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -110,7 +111,7 @@
                 <button onclick="save()">save</button>
                 <button>publish</button>
                 <button>delete</button>
-                <button>back</button>
+                <button onclick="clearEditor()">back</button>
             </div>
     </div>
     <div class="tab-pane fade" id="user" role="tabpanel" aria-labelledby="user-tab">
@@ -133,18 +134,32 @@
         const editordiv = document.getElementById("editordiv");
         const tablediv = document.getElementById("page_selector");
 
-        function showEditor(page) {
+        function setEditor(page) {
             editordiv.style.display = "block";
             tablediv.style.display = "none";
         }
+
+        function clearEditor() {
+            if(savedContents != quill.getSemanticHTML()) {
+                if(!confirm("Are you sure you want to exit without saving?")) {
+                    return;
+                }
+            }
+            editordiv.style.display = "none";
+            tablediv.style.display = "block";
+
+        }
+
+        var savedContents = "";
 
         function save() {
             const xhr = new XMLHttpRequest();
             xhr.open("POST", "/save");
             xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+            savedContents = quill.getSemanticHTML();
             const body = {
                 name: "filler",
-                body: quill.getSemanticHTML()
+                body: savedContents
             }
             xhr.onload = () => {
             if (xhr.readyState == 4 && xhr.status == 201) {
