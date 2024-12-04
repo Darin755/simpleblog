@@ -110,20 +110,21 @@ def newuser():
                 if isAdmin:
                     #don't delete ourselves'
                     if request.form['username2'] != auth:
-                        result = fileprocessing.deleteUser(request.form['username2'])
+                        returnMsg = fileprocessing.deleteUser(request.form['username2'])
                     else:
-                        result = "You can not delete yourself"
+                        returnMsg = "You can not delete yourself"
                 else:
-                    result = "You do not have permition to delete users"
+                    returnMsg = "You do not have permition to delete users"
             else:
                 if showAdminCheck:
                     if "admincheck" in request.form:
-                        result = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], True, auth)
+                        returnMsg = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], True, auth)
                     else:
-                        result = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], False, auth)
+                        returnMsg = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], False, auth)
                 else:
-                    result = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], None, auth)
-            return render_template('newUser.html', error=result ,showAdminCheck=showAdminCheck)
+                    returnMsg = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], None, auth)
+            #returnMsg is the message displayed to the user
+            return render_template('newUser.html', error=returnMsg ,showAdminCheck=showAdminCheck)
 
         elif request.method == "GET":
             return render_template('newUser.html', showAdminCheck=showAdminCheck)
