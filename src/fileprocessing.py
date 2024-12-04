@@ -167,28 +167,21 @@ def displayAll():
 
 
 def displayAllUsers(username):
-    returnList = []
-    q = Path.cwd()
-    
-    p = q  / 'users' / username / 'userData'
-    obj = p.iterdir()
-    for i in (obj):
-        
-        fullPath = str(i)
-        tupleToAdd = ()
-        fullPath = fullPath.split("\\")
-        string = fullPath[-1]
-        x = string.split("_")
-        tupleToAdd += (x[0],)
-        
-        y = x[1].split(".")
-        tupleToAdd += (y[0],)
-        returnList.append(tupleToAdd)
-            
-           
-        
+    tupleToAdd = ()
+    files = (Path.cwd()  / 'users' / username / 'userData').iterdir()
+    for filename in files:
+        try:
+            fullPath = filename.split("\\")
+            nameArray = fullPath[-1].split("_")
+            tupleToAdd += (nameArray[0],)
+            tupleToAdd += (nameArray[1].split(".")[0],)
+            tupleToAdd += (Path.cwd()  / 'users' / username / 'userData' / filename).stat().st_mtime
+            returnList.append(tupleToAdd)
+        except:
+            print("failed to parse "+i)
+
     #returns a list of users
-    return returnList
+    return tupleToAdd
 
 def publish(title, text):
   #check to make sure public exists

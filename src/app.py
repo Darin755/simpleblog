@@ -42,7 +42,7 @@ def root():
         auth = checkAuth(cookie)
         if not auth == False:
             #we are signed in
-            return render_template('dash.html', data=fileprocessing.displayAllUsers(str(auth)), username=str(auth), showAdminCheck=fileprocessing.checkAdmin(auth))
+            return render_template('dash.html', data=fileprocessing.displayAllUsers(auth), username=auth, showAdminCheck=fileprocessing.checkAdmin(auth))
         else:
             #login please
             return redirect("/login", code=302)
@@ -131,8 +131,8 @@ def newuser():
     else:
         return redirect("/login", code=302)
 
-#save
-@app.route('/save', methods=['POST'])
+#save page
+@app.route('/savepage', methods=['POST'])
 def handle_post():
     if request.method == 'POST':
         cookie = request.cookies.get('authcookie')
@@ -141,6 +141,17 @@ def handle_post():
             body = request.json
             print(body)
             return "saved"
+
+#create
+@app.route('/createpage', methods=['POST'])
+def handle_post():
+    if request.method == 'POST':
+        cookie = request.cookies.get('authcookie')
+        auth = checkAuth(cookie)
+        if not auth == False:
+            body = request.json
+            print(body)
+            return "created"
 
 
 if __name__ == '__main__':
