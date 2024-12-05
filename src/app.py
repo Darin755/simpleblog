@@ -41,6 +41,7 @@ def root():
         cookie = request.cookies.get('authcookie')
         auth = checkAuth(cookie)
         if not (auth == False):
+            print("serving dashboard to "+auth)
             #we are signed in
             isAdmin = fileprocessing.checkAdmin(auth)
             return render_template('dash.html', pages=fileprocessing.displayAllUsers(str(auth), isAdmin), username=auth, showAdminCheck=isAdmin, users=fileprocessing.allUsers(), published=fileprocessing.displayAll())
@@ -124,9 +125,18 @@ def newuser():
                         returnMsg = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], False, auth)
                 else:
                     returnMsg = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], None, auth)
+
             #returnMsg is the message displayed to the user
+
             admin = fileprocessing.checkAdmin(auth)
-            return render_template('dash.html', error=returnMsg, tab="user", pages=fileprocessing.displayAllUsers(str(auth), admin), username=auth, showAdminCheck=admin, users=fileprocessing.allUsers(), published=fileprocessing.displayAll())
+            if noUsers:
+                if not fileprocessing.noUsers():
+                    return redirect("/login", code=302)
+                else:
+                    return render_template("newUser.html", error=returnMsg, users=fileprocessing.allUsers(), showAdminCheck=admin)
+            else:
+                return render_template('dash.html', error=returnMsg, tab="user", pages=fileprocessing.displayAllUsers(str(auth), admin), username=auth, showAdminCheck=admin, users=fileprocessing.allUsers(), published=fileprocessing.displayAll())
+
 
         elif request.method == "GET":
             return render_template('newUser.html', showAdminCheck=showAdminCheck, users=fileprocessing.allUsers())

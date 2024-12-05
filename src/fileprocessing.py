@@ -43,7 +43,6 @@ def noUsers():
             
 def newUser(username, password, passwordcheck, admincheck, auth):
 # create a user
-    print("check is"+str(admincheck))
     #input the name for the user
     userPath = Path.cwd() / 'users' #gets the current working path plus user
 
@@ -51,9 +50,11 @@ def newUser(username, password, passwordcheck, admincheck, auth):
     if admincheck != None:
         if auth == username:
             if not admincheck:
+                print(auth+" can not strip there own admin access")
                 return "You can not strip your own admin access"
         else:
             if not checkAdmin(auth):
+                print("Non admin user "+auth+" tried to change user "+username)
                 return "You do not have permission"
 
     if(password == passwordcheck):
@@ -81,7 +82,7 @@ def newUser(username, password, passwordcheck, admincheck, auth):
                 makeAdmin(username)
             elif admincheck == False:
                 removeAdmin(username)
-            return "Updated user"
+            return "Updated user "+username
             #user is already in use but password updated
         else:
             #create a user with filename = to input
@@ -99,10 +100,10 @@ def newUser(username, password, passwordcheck, admincheck, auth):
             #if admin
             if admincheck or auth == False:
                 makeAdmin(username)
-            return "Created user"
+            return "Created user "+username
     else:
         #passwords did not match
-        return 1
+        return "Password need to match"
 
 #recursive function to delete
 def rmDir(dirpath):
@@ -119,9 +120,9 @@ def deleteUser(user):
     usernamePath = Path.cwd() / 'users' / user
     if usernamePath.exists():
         rmDir(usernamePath)
-        return "deleted user"
+        return "deleted user "+user
     else:
-        return "user does not exist"
+        return user+" does not exist thus it can't be deleted"
 
 #make a user admin
 def makeAdmin(user):
@@ -142,8 +143,10 @@ def checkAdmin(user):
     if user != False:
         usernamePath = Path.cwd() / 'users' / user
         if (usernamePath / "admin.txt").exists():
+            print(user+" is a admin")
             return True
         else:
+            print(user+"is not an admin")
             return False
 
 
@@ -169,7 +172,6 @@ def displayAllUsersHelper(username):
             editTime = (Path.cwd()  / 'users' / username / 'userData' / filename).stat().st_mtime
             tupleToAdd += (datetime.fromtimestamp(editTime).ctime(),)
             #published information
-            print(filename.name)
             if((Path.cwd() / 'public' / filename.name).exists()):
                 tupleToAdd += (filename.name,)
                 editTimePublished = (Path.cwd() / 'public' / filename.name).stat().st_mtime
@@ -184,12 +186,20 @@ def displayAllUsersHelper(username):
     return returnArray
 
 def displayAllUsers(username, admin):
+    print("fetching page list for "+username+"'s dashboard")
     returnList = []
-    if not admin:
-        returnList = displayAllUsersHelper(username)
-    else:
-        for user in [f for f in (Path.cwd()  / 'users').iterdir() if f.is_dir()]:
-            returnList += displayAllUsersHelper(user)
+    try:
+        if not admin:
+            returnList = displayAllUsersHelper(username)
+        else:
+            for user in [f for f in (Path.cwd()  / 'users').iterdir() if f.is_dir()]:
+                returnList += displayAllUsersHelper(user)
+    except Exception as e:
+        print("failed to get pages")
+        print(e)
+
+
+
     #returns a list of users
     return returnList
 
@@ -201,6 +211,7 @@ def publish(title, text):
     textfile.touch()
     #write to file
     textfile.write_text(text)
+    print("published page "+title)
   
 def savePage(title, text):
     username = title.split("_")[0]
@@ -211,8 +222,10 @@ def savePage(title, text):
     #write to file
     if text != -1:
         textfile.write_text(text)
+    print("saved changes to "+title)
 
 def getText(fileToGet):
+    print("serving page "+fileToGet)
     fileToGet+=".html"
     filePath = (Path.cwd()  / 'users' / fileToGet.split("_")[0] / 'userData' / fileToGet)
     if filePath.exists():
@@ -224,6 +237,9 @@ def deletePage(name):
     filePath = (Path.cwd()  / 'users' / name.split("_")[0] / 'userData' / (name+".html"))
     if (len(name) > 0) and filePath.exists():
         filePath.unlink()
+    else:
+        print(name+" not deleted because it doesn't exist")
+    print("deleted page "+name)
 
 def allUsers():
     rtnStr= ""
