@@ -42,7 +42,8 @@ def root():
         auth = checkAuth(cookie)
         if not (auth == False):
             #we are signed in
-            return render_template('dash.html', pages=fileprocessing.displayAllUsers(str(auth)), username=auth, showAdminCheck=fileprocessing.checkAdmin(auth))
+            isAdmin = fileprocessing.checkAdmin(auth)
+            return render_template('dash.html', pages=fileprocessing.displayAllUsers(str(auth), isAdmin), username=auth, showAdminCheck=isAdmin)
         else:
             #login please
             return redirect("/login", code=302)
@@ -124,47 +125,54 @@ def newuser():
                 else:
                     returnMsg = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], None, auth)
             #returnMsg is the message displayed to the user
-            print(request.url)
-            return render_template('dash.html', error=returnMsg, tab="user", pages=fileprocessing.displayAllUsers(str(auth)), username=auth, showAdminCheck=fileprocessing.checkAdmin(auth))
+            admin = fileprocessing.checkAdmin(auth)
+            return render_template('dash.html', error=returnMsg, tab="user", pages=fileprocessing.displayAllUsers(str(auth), admin), username=auth, showAdminCheck=admin)
 
         elif request.method == "GET":
             return render_template('newUser.html', showAdminCheck=showAdminCheck)
     else:
         return redirect("/login", code=302)
 
+@app.route('/getpage/<page>', methods=['GET'])
+def returnPage(page):
+
+    return ""
+
 #save page
 @app.route('/savepage', methods=['POST'])
 def handle_post():
-    if request.method == 'POST':
-        cookie = request.cookies.get('authcookie')
-        auth = checkAuth(cookie)
-        if not auth == False:
-            body = request.json
-            print(body)
-            return "saved"
+    cookie = request.cookies.get('authcookie')
+    auth = checkAuth(cookie)
+    if not auth == False:
+        body = request.json
+        print(body)
+        return "saved"
+    else:
+        return redirect("/login", code=302)
 
 #create
 @app.route('/createpage', methods=['POST'])
 def handle_create():
-    if request.method == 'POST':
-        cookie = request.cookies.get('authcookie')
-        auth = checkAuth(cookie)
-        if not auth == False:
-            body = request.json
-            print(body)
-            return "created"
+    cookie = request.cookies.get('authcookie')
+    auth = checkAuth(cookie)
+    if not auth == False:
+        body = request.json
+        print(body)
+        return "created"
+    else:
+        return redirect("/login", code=302)
 
 #delete
 @app.route('/deletepage', methods=['POST'])
 def handle_delete():
-    if request.method == 'POST':
-        cookie = request.cookies.get('authcookie')
-        auth = checkAuth(cookie)
-        if not auth == False:
-            body = request.json
-            print(body)
-            return "created"
-
+    cookie = request.cookies.get('authcookie')
+    auth = checkAuth(cookie)
+    if not auth == False:
+        body = request.json
+        print(body)
+        return "created"
+    else:
+        return redirect("/login", code=302)
 
 if __name__ == '__main__':
     app.run()

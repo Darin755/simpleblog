@@ -1,6 +1,7 @@
 from pathlib import Path
 import bcrypt
 from datetime import datetime
+import os
 '''
 Pathlib is a python library that allows for proper path navigation throughout files
 bcrypt is a python library that allows for encryption of strings 
@@ -168,13 +169,16 @@ def displayAll():
         #returns a list of users
     return returnList
 
-
-def displayAllUsers(username):
-    returnList = []
+def displayALlUsersHelper(username):
+    returnArray = []
     files = (Path.cwd()  / 'users' / username / 'userData').iterdir()
     for filename in files:
         try:
-            fullPath = str(filename).split("\\")
+            if os.name == 'nt':
+                fullPath = str(filename).split("\\")
+            else:
+                fullPath = str(filename).split("/")
+
             tupleToAdd = ()
             nameArray = fullPath[-1].split("_")
             #[0] is username
@@ -184,11 +188,19 @@ def displayAllUsers(username):
             #[2] is last modification
             editTime = (Path.cwd()  / 'users' / username / 'userData' / filename).stat().st_mtime
             tupleToAdd += (datetime.fromtimestamp(editTime).ctime(),)
-            returnList.append(tupleToAdd)
+            returnArray.append(tupleToAdd)
         except Exception as e:
             print(e)
             print("failed to parse "+str(filename))
+    return returnArray
 
+def displayAllUsers(username, admin):
+    returnList = []
+    if not admin:
+        returnList = displayALlUsersHelper(username)
+    else:
+        for user in [f for f in (Path.cwd()  / 'users').iterdir() if f.is_dir()]:
+            returnList += displayALlUsersHelper(user)
     #returns a list of users
     return returnList
 

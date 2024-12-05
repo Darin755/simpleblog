@@ -81,6 +81,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th scope="col">Username</th>
                         <th scope="col">Page Name</th>
                         <th scope="col">Modified</th>
                         <th scope="col">Published URL</th>
@@ -91,6 +92,7 @@
                 <tbody>
                     {% for page in pages %}
                         <tr>
+                            <td>{{ page[0] }}</td>
                             <td>{{ page[1] }}</td>
                             <td>{{ page[2] }}</td>
                             <td>Not Published</td>
@@ -154,12 +156,11 @@
 
         function save() {
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", "/save");
+            xhr.open("POST", "/savepage");
             xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
-            savedContents = quill.getSemanticHTML();
             const body = {
                 name: "filler",
-                body: savedContents
+                body: quill.getSemanticHTML()
             }
             xhr.onload = () => {
             if (xhr.readyState == 4 && xhr.status == 201) {
@@ -167,8 +168,10 @@
             } else {
                 if(xhr.status == 200) {
                     console.log("200 - OK");
+                    savedContents = quill.getSemanticHTML();
                 } else {
                     console.log("error status "+xhr.status);
+                    alert("failed to save")
                 }
             }
             };
