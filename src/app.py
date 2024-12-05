@@ -43,7 +43,7 @@ def root():
         if not (auth == False):
             #we are signed in
             isAdmin = fileprocessing.checkAdmin(auth)
-            return render_template('dash.html', pages=fileprocessing.displayAllUsers(str(auth), isAdmin), username=auth, showAdminCheck=isAdmin)
+            return render_template('dash.html', pages=fileprocessing.displayAllUsers(str(auth), isAdmin), username=auth, showAdminCheck=isAdmin, users=fileprocessing.allUsers(), published=fileprocessing.displayAll())
         else:
             #login please
             return redirect("/login", code=302)
@@ -126,17 +126,24 @@ def newuser():
                     returnMsg = fileprocessing.newUser(request.form['username2'], request.form['password2'], request.form['passwordCheck'], None, auth)
             #returnMsg is the message displayed to the user
             admin = fileprocessing.checkAdmin(auth)
-            return render_template('dash.html', error=returnMsg, tab="user", pages=fileprocessing.displayAllUsers(str(auth), admin), username=auth, showAdminCheck=admin)
+            return render_template('dash.html', error=returnMsg, tab="user", pages=fileprocessing.displayAllUsers(str(auth), admin), username=auth, showAdminCheck=admin, users=fileprocessing.allUsers(), published=fileprocessing.displayAll())
 
         elif request.method == "GET":
-            return render_template('newUser.html', showAdminCheck=showAdminCheck)
+            return render_template('newUser.html', showAdminCheck=showAdminCheck, users=fileprocessing.allUsers())
     else:
         return redirect("/login", code=302)
 
 @app.route('/getpage/<page>', methods=['GET'])
 def returnPage(page):
-
-    return ""
+    cookie = request.cookies.get('authcookie')
+    auth = checkAuth(cookie)
+    if not auth == False:
+        if (fileprocessing.checkAdmin(auth) or (auth in page)):
+            return fileprocessing.getText(page)
+        else:
+            return "not permitted"
+    else:
+        return redirect("/login", code=302)
 
 #save page
 @app.route('/savepage', methods=['POST'])
@@ -145,8 +152,11 @@ def handle_post():
     auth = checkAuth(cookie)
     if not auth == False:
         body = request.json
-        print(body)
-        return "saved"
+        if (fileprocessing.checkAdmin(auth) or (auth in page)):
+            fileprocessing.savePage(body["name"], body["body"])
+            return "saved"
+        else:
+            return "not permitted"
     else:
         return redirect("/login", code=302)
 
@@ -157,7 +167,8 @@ def handle_create():
     auth = checkAuth(cookie)
     if not auth == False:
         body = request.json
-        print(body)
+        name = auth+"_"+body["name"]
+        fileprocessing.savePage(name, -1)
         return "created"
     else:
         return redirect("/login", code=302)
@@ -168,11 +179,30 @@ def handle_delete():
     cookie = request.cookies.get('authcookie')
     auth = checkAuth(cookie)
     if not auth == False:
-        body = request.json
-        print(body)
-        return "created"
+        if (fileprocessing.checkAdmin(auth) or (auth in page)):
+            body = request.json
+            fileprocessing.deletePage(body["name"])
+            return "deleted"
+        else:
+            return "not permitted"
     else:
         return redirect("/login", code=302)
+#publish
+@app.route('/publish', methods=['POST'])
+def handle_publish():
+    cookie = request.cookies.get('authcookie')
+    auth = checkAuth(cookie)
+    if not auth == False:
+        if (fileprocessing.checkAdmin(auth) or (auth in page)):
+            body = request.json
+            contents = fileprocessing.getText(body["name"])
+            fileprocessing.publish(body["name"], render_template('published.html', contents=contents))
+            return "published"
+        else:
+            return "not permitted"
+    else:
+        return redirect("/login", code=302)
+
 
 if __name__ == '__main__':
     app.run()

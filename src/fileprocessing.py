@@ -1,7 +1,6 @@
 from pathlib import Path
 import bcrypt
 from datetime import datetime
-import os
 '''
 Pathlib is a python library that allows for proper path navigation throughout files
 bcrypt is a python library that allows for encryption of strings 
@@ -10,6 +9,9 @@ bcrypt is a python library that allows for encryption of strings
 
 if not (Path.cwd() / 'users').exists():
     (Path.cwd() / 'users').mkdir(exist_ok=False)
+
+if not (Path.cwd() / 'public').exists():
+    (Path.cwd() / 'public').mkdir(exist_ok=False)
 
 
 def login(username, password):
@@ -92,7 +94,7 @@ def newUser(username, password, passwordcheck, admincheck, auth):
             (usernamePath / 'userData').mkdir()
 
             #create default page
-            savePage("index", username+"'s page", username)
+            savePage(username+"_index", username+"'s page")
 
             #if admin
             if admincheck or auth == False:
@@ -147,40 +149,18 @@ def checkAdmin(user):
 
 def displayAll():
     returnList = []
-    if not (Path.cwd() / 'public').exists():
-        (Path.cwd() / 'public').mkdir(exist_ok=False)
-    returnList = []
-    q = Path.cwd()
-    
-    p = q  / 'public'
-    obj = p.iterdir()
-    for i in (obj):
-        
-        fullPath = str(i)
-        tupleToAdd = ()
-        fullPath = fullPath.split("\\")
-        string = fullPath[-1]
-        x = string.split("_")
-        tupleToAdd += (x[0],)
-        
-        y = x[1].split(".")
-        tupleToAdd += (y[0],)
-        returnList.append(tupleToAdd)
-        #returns a list of users
+    files = [f for f in (Path.cwd()  / 'public').iterdir() if (not f.is_dir()) and (f.name.endswith(".html"))]
+    for file in files:
+        returnList.append(file.name)
     return returnList
 
-def displayALlUsersHelper(username):
+def displayAllUsersHelper(username):
     returnArray = []
     files = (Path.cwd()  / 'users' / username / 'userData').iterdir()
     for filename in files:
         try:
-            if os.name == 'nt':
-                fullPath = str(filename).split("\\")
-            else:
-                fullPath = str(filename).split("/")
-
             tupleToAdd = ()
-            nameArray = fullPath[-1].split("_")
+            nameArray = filename.name.split("_")
             #[0] is username
             tupleToAdd += (nameArray[0],)
             #[1] is title
@@ -188,6 +168,15 @@ def displayALlUsersHelper(username):
             #[2] is last modification
             editTime = (Path.cwd()  / 'users' / username / 'userData' / filename).stat().st_mtime
             tupleToAdd += (datetime.fromtimestamp(editTime).ctime(),)
+            #published information
+            print(filename.name)
+            if((Path.cwd() / 'public' / filename.name).exists()):
+                tupleToAdd += (filename.name,)
+                editTimePublished = (Path.cwd() / 'public' / filename.name).stat().st_mtime
+                tupleToAdd += (datetime.fromtimestamp(editTimePublished).ctime(),)
+            else:
+                tupleToAdd += ("Not Published",)
+                tupleToAdd += ("N/A",)
             returnArray.append(tupleToAdd)
         except Exception as e:
             print(e)
@@ -197,56 +186,47 @@ def displayALlUsersHelper(username):
 def displayAllUsers(username, admin):
     returnList = []
     if not admin:
-        returnList = displayALlUsersHelper(username)
+        returnList = displayAllUsersHelper(username)
     else:
         for user in [f for f in (Path.cwd()  / 'users').iterdir() if f.is_dir()]:
-            returnList += displayALlUsersHelper(user)
+            returnList += displayAllUsersHelper(user)
     #returns a list of users
     return returnList
 
-def publish(title, text, url):
-  #check to make sure public exists
-  if not (Path.cwd() / 'public').exists():
-      (Path.cwd() / 'public').mkdir(exist_ok=False)
-  q = Path.cwd() / 'public'
-  #move to public
-  title = username + '_' + title + '.txt'
-  #naming convention of username_title.txt
-  q = q / title
-  q.touch()
-  #create file
-  q.write_text(text)
-  #write to file
-  
-def savePage(title, text, username):
+def publish(title, text):
+    username = title.split("_")[0]
     #saves using username_title as convention
-    title = username + '_' + title + '.txt'
-    textfile = Path.cwd()  / 'users' /  username / 'userData' / title
+    textfile = Path.cwd()  / 'public' /  (title+".html")
     #create file
     textfile.touch()
     #write to file
     textfile.write_text(text)
+  
+def savePage(title, text):
+    username = title.split("_")[0]
+    #saves using username_title as convention
+    textfile = Path.cwd()  / 'users' /  username / 'userData' / (title+".html")
+    #create file
+    textfile.touch()
+    #write to file
+    if text != -1:
+        textfile.write_text(text)
 
-def getText(mode, fileToGet):
-    q = Path.cwd()
-    #if method was from user profile
-    if(mode == 1):
-        p = q  / 'users' / username / fileToGet
+def getText(fileToGet):
+    fileToGet+=".html"
+    filePath = (Path.cwd()  / 'users' / fileToGet.split("_")[0] / 'userData' / fileToGet)
+    if filePath.exists():
+        return (Path.cwd()  / 'users' / fileToGet.split("_")[0] / 'userData' / fileToGet).read_text()
     else:
-        #if method was from public
-        p = q  / 'public' / fileToGet
-    return p.read_text
+        return "not found"
 
-#write the page
-def writePage(url,html):
-    #The html var is the output from render_template
-    return "hi"#just a place holder
+def deletePage(name):
+    filePath = (Path.cwd()  / 'users' / name.split("_")[0] / 'userData' / (name+".html"))
+    if (len(name) > 0) and filePath.exists():
+        filePath.unlink()
 
-def getPages():
-    #returns a dictionary
-    # this will have nested dictionaries for subfolders
-    return {}
-
-def deletePage(url):
-    #takes either a folder or a page
-    return "deleted"
+def allUsers():
+    rtnStr= ""
+    for user in [f for f in (Path.cwd()  / 'users').iterdir() if f.is_dir()]:
+        rtnStr+=user.name+" "
+    return rtnStr

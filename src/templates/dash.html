@@ -49,6 +49,9 @@
 
 </script>
 
+<script src="static/lib/quilljs/quill.js"></script>
+<link href="static/lib/quilljs/quill.snow.css" rel="stylesheet">
+
 <body>
     {{ bootstrap.load_js() }}
 
@@ -65,16 +68,12 @@
     </ul>
     <div class="tab-content" id="menutabs">
         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-            <h1 id="clock"></h1>
-            <script>
-                //clock
-                const clock = document.getElementById("clock");
-                clock.innerHTML = (new Date().toLocaleTimeString());
-                window.setInterval(function() {
-                    //update the clock
-                    clock.innerHTML = (new Date().toLocaleTimeString());
-                }, 1000);
-            </script>
+            <h2>Published pages</h2>
+            <ul>
+            {% for p in published %}
+                <li>{{ p }}</li>
+            {% endfor %}
+            </ul>
         </div>
     <div class="tab-pane fade" id="pages" role="tabpanel" aria-labelledby="pages-tab">
         <div id="page_selector">
@@ -84,8 +83,8 @@
                         <th scope="col">Username</th>
                         <th scope="col">Page Name</th>
                         <th scope="col">Modified</th>
-                        <th scope="col">Published URL</th>
-                        <th scope="col">Published time</th>
+                        <th scope="col">Published file</th>
+                        <th scope="col">Published Modified</th>
                         <th scope="col">edit</th>
                     </tr>
                 </thead>
@@ -95,24 +94,24 @@
                             <td>{{ page[0] }}</td>
                             <td>{{ page[1] }}</td>
                             <td>{{ page[2] }}</td>
-                            <td>Not Published</td>
-                            <td>N/A</td>
-                            <td><button onclick="setEditor('{{ page[1] }}')" class="btn btn-primary">Edit</button></td>
+                            <td>{{ page[3] }}</td>
+                            <td>{{ page[4] }}</td>
+                            <td><button onclick="setEditor('{{ page[0] }}_{{ page[1] }}')" class="btn btn-primary">Edit</button></td>
                         </tr>
                     {% endfor %}
                 </tbody>
 
             </table>
             <div>
-                <button onclick="" class="btn btn-primary">Create page</button>
                 <input id="filename" placeholder="your page name"></input>
+                <button onclick="createPage()" class="btn btn-primary">Create page</button>
             </div>
         </div>
         <div id="editordiv" style="display:none;">
             <div id="editor"></div>
                 <button onclick="save()">save</button>
-                <button>publish</button>
-                <button>delete</button>
+                <button onclick="publish()">publish</button>
+                <button onclick="deletePage()">delete</button>
                 <button onclick="clearEditor()">back</button>
             </div>
     </div>
@@ -136,12 +135,23 @@
         const editordiv = document.getElementById("editordiv");
         const tablediv = document.getElementById("page_selector");
 
-        function setEditor(page) {
-            editordiv.style.display = "block";
-            tablediv.style.display = "none";
+        async function setEditor(page) {
+            var fetchObj = await fetch("/getpage/"+page);
+            var body = await fetchObj.text();
+            if (body == "not permitted") {
+                alert("not permitted")
+            } else if (body == "not found") {
+                alert("content not found")
+            } else {
+                quill.root.innerHTML = body;
+                savedContents = body;
+                activePage = page;
+                editordiv.style.display = "block";
+                tablediv.style.display = "none";
+            }
         }
 
-        function clearEditor() {
+        async function clearEditor() {
             if(savedContents != quill.getSemanticHTML()) {
                 if(!confirm("Are you sure you want to exit without saving?")) {
                     return;
@@ -149,34 +159,109 @@
             }
             editordiv.style.display = "none";
             tablediv.style.display = "block";
-
+            quill.root.innerHTML = "";
+            activePage = "";
         }
 
-        var savedContents = "";
+        var savedContents = "<p></p>";
+        var activePage = "";
 
         function save() {
             const xhr = new XMLHttpRequest();
             xhr.open("POST", "/savepage");
             xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
             const body = {
-                name: "filler",
+                name: activePage,
                 body: quill.getSemanticHTML()
             }
             xhr.onload = () => {
-            if (xhr.readyState == 4 && xhr.status == 201) {
-                console.log(JSON.parse(xhr.responseText));
-            } else {
-                if(xhr.status == 200) {
-                    console.log("200 - OK");
-                    savedContents = quill.getSemanticHTML();
+                if (xhr.readyState == 4 && xhr.status == 201) {
+                    console.log(JSON.parse(xhr.responseText));
                 } else {
-                    console.log("error status "+xhr.status);
-                    alert("failed to save")
+                    if(xhr.status == 200) {
+                        console.log("200 - OK");
+                        savedContents = quill.getSemanticHTML();
+                    } else {
+                        console.log("error status "+xhr.status);
+                        alert("failed to save")
+                    }
                 }
-            }
             };
-		{% set count = namespace(value= request.form.Title) %}
             xhr.send(JSON.stringify(body));
+        }
+
+        function deletePage() {
+            if(confirm("Are you sure?")) {
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "/deletepage");
+                xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+                const body = { name: activePage };
+                xhr.onload = () => {
+                    if (xhr.readyState == 4 && xhr.status == 201) {
+                        console.log(JSON.parse(xhr.responseText));
+                    } else {
+                        if(xhr.status == 200) {
+                            console.log("200 - OK");
+                            location.reload();
+
+                        } else {
+                            console.log("error status "+xhr.status);
+                            alert("failed to delete");
+                        }
+                    }
+                };
+                xhr.send(JSON.stringify(body));
+            }
+        }
+
+        function createPage() {
+            var title = document.getElementById("filename").value;
+            if (title != "" || title.indexOf("_") == -1 || title.indexOf("/") == -1 || title.indexOf("\/") == -1) {
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "/createpage");
+                xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+                xhr.onload = () => {
+                    if (xhr.readyState == 4 && xhr.status == 201) {
+                        console.log(JSON.parse(xhr.responseText));
+                    } else {
+                        if(xhr.status == 200) {
+                            console.log("200 - OK");
+                            location.reload();
+
+                        } else {
+                            console.log("error status "+xhr.status);
+                            alert("failed to create");
+                        }
+                    }
+                };
+                xhr.send(JSON.stringify({name: title}));
+
+            } else {
+                alert("invalid name")
+            }
+
+        }
+
+        function publish() {
+                save();
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "/publish");
+                xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+                xhr.onload = () => {
+                    if (xhr.readyState == 4 && xhr.status == 201) {
+                        console.log(JSON.parse(xhr.responseText));
+                    } else {
+                        if(xhr.status == 200) {
+                            console.log("200 - OK");
+                            location.reload();
+
+                        } else {
+                            console.log("error status "+xhr.status);
+                            alert("failed to publish");
+                        }
+                    }
+                };
+                xhr.send(JSON.stringify({name: activePage}));
         }
 
 

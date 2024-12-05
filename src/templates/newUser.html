@@ -4,6 +4,7 @@
     {{ bootstrap.load_js() }}
     <div class="container d-flex flex-column justify-content-center align-items-center w-25 border " style="height: 500px; margin-top: 50px;">
       <h1>User Settings</h1>
+      <p>Users: {{ users }}</p>
       <br>
       <form action="/newuser" method="post">
         <div data-mdb-input-init class="form-outline mb-4">
